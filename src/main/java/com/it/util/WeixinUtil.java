@@ -6,19 +6,19 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.json.JSONObject;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -27,7 +27,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-
+import org.json.simple.JSONValue;
 import com.it.menu.Button;
 import com.it.menu.ClickButton;
 import com.it.menu.Menu;
@@ -37,15 +37,17 @@ import com.it.trans.Data;
 import com.it.trans.Parts;
 import com.it.trans.Symbols;
 import com.it.trans.TransResult;
+import net.sf.json.JSONObject;
 
 /**
  * 微信工具类
  * @author Stephen
  *
  */
+@SuppressWarnings("unchecked")
 public class WeixinUtil {
-	private static final String APPID = "wxfa1bfbb5a402846a";
-	private static final String APPSECRET = "726a0ef378d2fb155be38612d2ae8a8d";
+	private static final String APPID = "wxa3f979f77f0d395b";
+	private static final String APPSECRET = "516da53e1ece029cb4067ef46f7567f9";
 	//获取token的url
 	private static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
 	
@@ -56,6 +58,35 @@ public class WeixinUtil {
 	private static final String QUERY_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=ACCESS_TOKEN";
 	
 	private static final String DELETE_MENU_URL = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=ACCESS_TOKEN";
+	
+	
+	/**
+	 * 输入未知指令时的随机回复
+	 * @return
+	 */
+	public static String getRandomStr(){
+		List<String> jokes=new ArrayList<String>();
+		jokes.add("你是在开玩笑的吗,我没听清楚");
+		jokes.add("未知指令");
+		jokes.add("你又调皮了");
+		jokes.add("俺听不懂,说普通话");
+		jokes.add("别逗");
+		jokes.add("呵呵");
+		jokes.add("嘻嘻");
+		jokes.add("哈哈");
+		jokes.add("你妹");
+		jokes.add("客官来啦");
+		jokes.add("给你个萝莉");
+		jokes.add("给你个御姐");
+		jokes.add("请问贵姓");
+		jokes.add("你是男是女?");
+		int num=jokes.size();
+		System.out.println("------------------当前jokes数目:-----------------\n"+num);
+		return jokes.get((int) (Math.random()*(num)));
+	}
+	
+	
+	
 	/**
 	 * get请求
 	 * @param url
@@ -218,17 +249,22 @@ public class WeixinUtil {
 	public static Menu initMenu(){
 		Menu menu = new Menu();
 		ClickButton button11 = new ClickButton();
-		button11.setName("click菜单");
+		button11.setName("菜单");
 		button11.setType("click");
 		button11.setKey("11");
 		
 		ViewButton button21 = new ViewButton();
-		button21.setName("view菜单");
+		button21.setName("资讯");
 		button21.setType("view");
-		button21.setUrl("http://www.imooc.com");
+		button21.setUrl("http://www.2345free.com/wordpress/");
+		
+		ClickButton button33 = new ClickButton();
+		button33.setName("天气查询");
+		button33.setType("click");
+		button33.setKey("33");
 		
 		ClickButton button31 = new ClickButton();
-		button31.setName("扫码事件");
+		button31.setName("扫码");
 		button31.setType("scancode_push");
 		button31.setKey("31");
 		
@@ -238,8 +274,8 @@ public class WeixinUtil {
 		button32.setKey("32");
 		
 		Button button = new Button();
-		button.setName("菜单");
-		button.setSub_button(new Button[]{button31,button32});
+		button.setName("工具");
+		button.setSub_button(new Button[]{button33,button31,button32});
 		
 		menu.setButton(new Button[]{button11,button21,button});
 		return menu;
@@ -314,4 +350,79 @@ public class WeixinUtil {
 		}
 		return dst.toString();
 	}
+	
+	/**
+	 * 天气查询
+	 * @param source
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 */
+	public static String getWeather(String city) throws ParseException, IOException{
+		
+		String httpUrl = "http://apis.baidu.com/apistore/weatherservice/cityname";
+		String httpArg = "cityname="+city;
+		String jsonResult = request(httpUrl, httpArg);
+//		System.out.println(jsonResult);
+		StringBuffer sb=new StringBuffer();
+		org.json.simple.JSONObject info=(org.json.simple.JSONObject)JSONValue.parse(jsonResult);
+		if(info.get("errMsg").equals("success")){
+			org.json.simple.JSONObject tq=(org.json.simple.JSONObject)info.get("retData");
+			sb.append("【"+tq.get("city")+"天气预报】\n");
+			sb.append("发布时间:"+tq.get("date")+" "+tq.get("time")+"\n");
+			sb.append("天气:"+tq.get("weather")+"\n");
+			sb.append("气温:"+tq.get("temp")+"℃\n");
+			sb.append("最低气温:"+tq.get("l_tmp")+"℃\n");
+			sb.append("最高气温:"+tq.get("h_tmp")+"℃\n");
+			sb.append("风向:"+tq.get("WD")+"\n");
+			sb.append("风力:"+tq.get("WS")+"\n");
+			sb.append("日出时间:"+tq.get("sunrise")+"\n");
+			sb.append("日落时间:"+tq.get("sunset")+"\n");
+			
+		}else{
+			sb.append("未查到\""+URLDecoder.decode(city,"utf-8")+"\"的城市天气信息,请输入正确的城市名称,如\"上海天气\"");
+		}
+		
+		return sb.toString();
+	}
+	
+	
+
+	/**
+	 * @param urlAll
+	 *            :请求接口
+	 * @param httpArg
+	 *            :参数
+	 * @return 返回结果
+	 */
+	public static String request(String httpUrl, String httpArg) {
+	    BufferedReader reader = null;
+	    String result = null;
+	    StringBuffer sbf = new StringBuffer();
+	    httpUrl = httpUrl + "?" + httpArg;
+
+	    try {
+	        URL url = new URL(httpUrl);
+	        HttpURLConnection connection = (HttpURLConnection) url
+	                .openConnection();
+	        connection.setRequestMethod("GET");
+	        // 填入apikey到HTTP header
+	        connection.setRequestProperty("apikey",  "fed3a44d7e10a02a161bd72bf2422a60");
+	        connection.connect();
+	        InputStream is = connection.getInputStream();
+	        reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+	        String strRead = null;
+	        while ((strRead = reader.readLine()) != null) {
+	            sbf.append(strRead);
+	            sbf.append("\r\n");
+	        }
+	        reader.close();
+	        result = sbf.toString();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
+
+	
 }

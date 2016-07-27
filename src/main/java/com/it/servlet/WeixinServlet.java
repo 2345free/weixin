@@ -2,6 +2,7 @@ package com.it.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -17,7 +18,7 @@ import com.it.util.WeixinUtil;
 
 public class WeixinServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
+	
 	@Override
 	/**
 	 * 验证消息是否是来自微信服务器的
@@ -74,7 +75,7 @@ public class WeixinServlet extends HttpServlet {
 				if("1".equals(content)){
 					message = MessageUtil.initText(toUserName, fromUserName, MessageUtil.firstMenu());
 				}else if("2".equals(content)){
-					message = MessageUtil.initNewsMessage(toUserName, fromUserName);
+					message = MessageUtil.initText(toUserName, fromUserName,MessageUtil.secondMenu());
 				}else if("3".equals(content)){
 					message = MessageUtil.initText(toUserName, fromUserName, MessageUtil.threeMenu());
 				}else if("?".equals(content) || "？".equals(content)){
@@ -86,6 +87,16 @@ public class WeixinServlet extends HttpServlet {
 					}else{
 						message = MessageUtil.initText(toUserName, fromUserName, WeixinUtil.translate(word));
 					}
+				}else if(content.endsWith("天气")){
+					String word = content.replaceAll("天气$", "").trim();
+					System.out.println(word);
+					if("".equals(word)){
+						message = MessageUtil.initText(toUserName, fromUserName, MessageUtil.threeMenu());
+					}else{
+						message = MessageUtil.initText(toUserName, fromUserName, WeixinUtil.getWeather(URLEncoder.encode(word,"utf-8")));
+					}
+				}else{
+					message= MessageUtil.initText(toUserName, fromUserName,WeixinUtil.getRandomStr());
 				}
 				/*
 				 * 菜单点击事件消息处理
@@ -101,7 +112,12 @@ public class WeixinServlet extends HttpServlet {
 				 * 点击菜单拉取消息时的事件推送
 				 */
 				}else if(MessageUtil.MESSAGE_CLICK.equals(eventType)){
-					message = MessageUtil.initText(toUserName, fromUserName, MessageUtil.menuText());
+					String eventKey=map.get("EventKey");
+					//主菜单点击
+					if("11".equals(eventKey))
+						message = MessageUtil.initText(toUserName, fromUserName, MessageUtil.menuText());
+					else if("33".equals(eventKey))
+						message = MessageUtil.initText(toUserName, fromUserName, MessageUtil.weather());
 				/*
 				 * 点击菜单跳转链接时的事件推送
 				 */
@@ -121,9 +137,11 @@ public class WeixinServlet extends HttpServlet {
 			}else if(MessageUtil.MESSAGE_LOCATION.equals(msgType)){
 				String label = map.get("Label");
 				message = MessageUtil.initText(toUserName, fromUserName, label);
+			}else{
+				message= MessageUtil.initText(toUserName, fromUserName,WeixinUtil.getRandomStr());
 			}
 			
-			System.out.println(message);
+			System.out.println("----------------------------message-------------------\n"+message);
 			
 			out.print(message);
 		} catch (DocumentException e) {

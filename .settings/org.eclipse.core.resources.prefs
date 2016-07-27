@@ -1,3 +1,4 @@
 eclipse.preferences.version=1
-encoding//src/main/java=utf8
-encoding//src/test/java=utf8
+encoding//src/main/java=gbk
+encoding//src/main/java/com/it/test/WeixinTest.java=GBK
+encoding//src/test/java=gbk
