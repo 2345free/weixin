@@ -19,6 +19,7 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -27,7 +28,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONValue;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.it.menu.Button;
 import com.it.menu.ClickButton;
 import com.it.menu.Menu;
@@ -37,7 +40,6 @@ import com.it.trans.Data;
 import com.it.trans.Parts;
 import com.it.trans.Symbols;
 import com.it.trans.TransResult;
-import net.sf.json.JSONObject;
 
 /**
  * 微信工具类
@@ -102,7 +104,7 @@ public class WeixinUtil {
 		HttpEntity entity = httpResponse.getEntity();
 		if(entity != null){
 			String result = EntityUtils.toString(entity,"UTF-8");
-			jsonObject = JSONObject.fromObject(result);
+			jsonObject = JSON.parseObject(result);
 		}
 		return jsonObject;
 	}
@@ -122,7 +124,7 @@ public class WeixinUtil {
 		httpost.setEntity(new StringEntity(outStr,"UTF-8"));
 		HttpResponse response = client.execute(httpost);
 		String result = EntityUtils.toString(response.getEntity(),"UTF-8");
-		jsonObject = JSONObject.fromObject(result);
+		jsonObject = JSON.parseObject(result);
 		return jsonObject;
 	}
 	
@@ -215,7 +217,7 @@ public class WeixinUtil {
 			}
 		}
 
-		JSONObject jsonObj = JSONObject.fromObject(result);
+		JSONObject jsonObj = (JSONObject) JSON.toJSON(result);
 		System.out.println(jsonObj);
 		String typeName = "media_id";
 		if(!"image".equals(type)){
@@ -237,7 +239,7 @@ public class WeixinUtil {
 		JSONObject jsonObject = doGetStr(url);
 		if(jsonObject!=null){
 			token.setToken(jsonObject.getString("access_token"));
-			token.setExpiresIn(jsonObject.getInt("expires_in"));
+			token.setExpiresIn(jsonObject.getIntValue("expires_in"));
 		}
 		return token;
 	}
@@ -286,7 +288,7 @@ public class WeixinUtil {
 		String url = CREATE_MENU_URL.replace("ACCESS_TOKEN", token);
 		JSONObject jsonObject = doPostStr(url, menu);
 		if(jsonObject != null){
-			result = jsonObject.getInt("errcode");
+			result = jsonObject.getIntValue("errcode");
 		}
 		return result;
 	}
@@ -302,7 +304,7 @@ public class WeixinUtil {
 		JSONObject jsonObject = doGetStr(url);
 		int result = 0;
 		if(jsonObject != null){
-			result = jsonObject.getInt("errcode");
+			result = jsonObject.getIntValue("errcode");
 		}
 		return result;
 	}
@@ -315,7 +317,7 @@ public class WeixinUtil {
 		Object obj = jsonObject.get("data");
 		StringBuffer dst = new StringBuffer();
 		if("0".equals(errno) && !"[]".equals(obj.toString())){
-			TransResult transResult = (TransResult) JSONObject.toBean(jsonObject, TransResult.class);
+			TransResult transResult = (TransResult) JSON.toJavaObject(jsonObject, TransResult.class);
 			Data data = transResult.getData();
 			Symbols symbols = data.getSymbols()[0];
 			String phzh = symbols.getPh_zh()==null ? "" : "中文拼音："+symbols.getPh_zh()+"\n";
@@ -365,9 +367,9 @@ public class WeixinUtil {
 		String jsonResult = request(httpUrl, httpArg);
 //		System.out.println(jsonResult);
 		StringBuffer sb=new StringBuffer();
-		org.json.simple.JSONObject info=(org.json.simple.JSONObject)JSONValue.parse(jsonResult);
+		JSONObject info=JSON.parseObject(jsonResult);
 		if(info.get("errMsg").equals("success")){
-			org.json.simple.JSONObject tq=(org.json.simple.JSONObject)info.get("retData");
+			JSONObject tq=info.getJSONObject("retData");
 			sb.append("【"+tq.get("city")+"天气预报】\n");
 			sb.append("发布时间:"+tq.get("date")+" "+tq.get("time")+"\n");
 			sb.append("天气:"+tq.get("weather")+"\n");

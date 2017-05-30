@@ -4,11 +4,10 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 
+import com.alibaba.fastjson.JSON;
 import com.it.menu.Menu;
 import com.it.po.AccessToken;
 import com.it.util.WeixinUtil;
-
-import net.sf.json.JSONObject;
 
 public class WeixinTest {
 	public static void main(String[] args) {
@@ -39,7 +38,7 @@ public class WeixinTest {
 		
 		//创建菜单
 		Menu menu = WeixinUtil.initMenu();
-		int result = WeixinUtil.createMenu(token.getToken(), JSONObject.fromObject(menu).toString());
+		int result = WeixinUtil.createMenu(token.getToken(), JSON.toJSON(menu).toString());
 		System.out.println(result);
 	}
 	
