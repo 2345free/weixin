@@ -1,14 +1,12 @@
 package com.it.menu;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper=false)
 public class ViewButton extends Button{
 	//view¿‡–Õ≤Àµ•url
 	private String url;
 
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
 }
