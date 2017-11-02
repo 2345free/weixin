@@ -4,9 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class ViewButton extends Button{
-	//view类型菜单url
-	private String url;
+@EqualsAndHashCode(callSuper = false)
+public class ViewButton extends Button {
+    //view类型菜单url
+    private String url;
 
 }

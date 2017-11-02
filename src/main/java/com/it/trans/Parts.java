@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Parts {
-	private String part;
-	private String[] means;
+    private String part;
+    private String[] means;
 }

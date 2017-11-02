@@ -4,9 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class ClickButton extends Button{
-	//Click类型菜单key
-	private String key;
+@EqualsAndHashCode(callSuper = false)
+public class ClickButton extends Button {
+    //Click类型菜单key
+    private String key;
 
 }

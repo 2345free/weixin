@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Menu {
-	//一级菜单
-	private Button[] button;
+    //一级菜单
+    private Button[] button;
 
 }
