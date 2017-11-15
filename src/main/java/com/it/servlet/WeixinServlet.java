@@ -34,7 +34,7 @@ public class WeixinServlet extends HttpServlet {
 
         PrintWriter out = resp.getWriter();
         /*
-		 * 检验signature,通过则原样返回echostr参数内容
+         * 检验signature,通过则原样返回echostr参数内容
 		 */
         if (CheckUtil.checkSignature(signature, timestamp, nonce)) {
             out.print(echostr);

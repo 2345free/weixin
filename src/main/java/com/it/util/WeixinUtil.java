@@ -39,8 +39,8 @@ import java.util.Map;
  */
 @SuppressWarnings("unchecked")
 public class WeixinUtil {
-    private static final String APPID = "wxa3f979f77f0d395b";
-    private static final String APPSECRET = "516da53e1ece029cb4067ef46f7567f9";
+    private static final String APPID = "wxb8dee7681564ce25";
+    private static final String APPSECRET = "adfbad34c2603e927ac5854090c2f455";
     //»ñÈ¡tokenµÄurl
     private static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
 
